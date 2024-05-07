@@ -2,13 +2,14 @@ import cv2
 import copy
 import math
 import pygame
+import settings
 
 
 def dist(x1, y1, x2, y2):
     return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** .5
 
 
-img = cv2.imread('image.png')
+img = cv2.imread(settings.filename)
 img2 = copy.deepcopy(img)
 
 l = []
