@@ -14,3 +14,6 @@ perlin_noise_params = [.05, 100]
 filename = 'image.png'
 
 line_thickness = 1
+
+shape_color = (0, 0, 0)
+background_color = (255, 255, 255)
