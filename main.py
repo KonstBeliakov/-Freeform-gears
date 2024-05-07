@@ -41,8 +41,10 @@ def draw(center_position, screen, pos, alpha, height, stretch=1.0, angles=None):
         else:
             a = angles[i]
         pygame.draw.line(screen, color,
-                         [-dx * stretch + a * settings.r * stretch + center_position[0], height[i] + center_position[1]],
-                         [-dx * stretch + stretch * a * settings.r + 1 + center_position[0], height[i + 1] + center_position[1]],
+                         [-dx * stretch + a * settings.r * stretch + center_position[0],
+                          height[i] + center_position[1]],
+                         [-dx * stretch + stretch * a * settings.r + 1 + center_position[0],
+                          height[i + 1] + center_position[1]],
                          1)
 
 
@@ -50,15 +52,13 @@ def run():
     random_generated = settings.random_generated
     if random_generated:
         noiseGenerator = PerlinNoise()
-        r = settings.r
-        n = settings.n
-        height = [r + noiseGenerator(i * settings.perlin_noise_params[0]) * settings.perlin_noise_params[1] for i in
-                  range(n)]
+        height = [settings.r + noiseGenerator(i * settings.perlin_noise_params[0]) * settings.perlin_noise_params[1] for i in
+                  range(settings.n)]
         k = height[0] / height[-1]
-        height = [height[i] * (1 + (k - 1) * (i / n)) for i in range(len(height))]
+        height = [height[i] * (1 + (k - 1) * (i / settings.n)) for i in range(len(height))]
     else:
-        r = image_read.r
-        n = len(image_read.angle)
+        settings.r = settings.r
+        settings.n = len(image_read.angle)
 
         height = [i[1] for i in image_read.angle]
         angles = [i[0] for i in image_read.angle]
@@ -97,27 +97,47 @@ def run():
 
 
 def apply_settings():
-    pass
+    try:
+        settings.r = int(entrys[0].get())
+        settings.n = int(entrys[1].get())
+        settings.speed = float(entrys[2].get())
+        settings.random_generated = False
+        settings.filename = entrys[6].get()
+        print(settings.filename)
+        if entrys[3].get() in ['True', 'y', 'Y', '1', 'yes', 'Yes', 'YES', 'true', 't']:
+            settings.random_generated = True
+        else:
+            image_read.img_to_obj()
+        settings.perlin_noise_params[0] = float(entrys[4].get())
+        settings.perlin_noise_params[1] = float(entrys[5].get())
+    except:
+        error_text = tk.Label(root, text='Incorrect settings parametres', fg='#f00')
+        error_text.grid(row=len(texts) + 1, column=0)
+        return False
+    else:
+        return True
 
 
 def change_text():
-    apply_settings()
-    run()
+    if apply_settings():
+        root.destroy()
+        run()
 
 
 if __name__ == '__main__':
     root = tk.Tk()
     root.title("Settings")
 
-    texts = ['r', 'n', 'speed', 'random generated figure (y/n)', 'k1', 'k2', 'filename']
-
-    entrys_values = ['' for i in range(len(texts))]
+    texts = ['radius of random figure', 'number of point', 'speed', 'random generated figure (y/n)', 'k1 ("period")', 'k2 ("amplitude")', 'filename']
+    entrys_values = [str(settings.r), str(settings.n), str(settings.speed), str(settings.random_generated),
+                     str(settings.perlin_noise_params[0]), str(settings.perlin_noise_params[1]), str(settings.filename)]
 
     labels = [tk.Label(root, text=text) for text in texts]
     entrys = [tk.Entry(root) for i in range(len(texts))]
 
     for i in range(len(texts)):
         labels[i].grid(row=i, column=0)
+        entrys[i].insert(0, entrys_values[i])
         entrys[i].grid(row=i, column=1)
 
     button = tk.Button(root, text="Run", command=change_text)
