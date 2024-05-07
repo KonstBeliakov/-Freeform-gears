@@ -46,8 +46,6 @@ def img_to_obj():
 
 
 if __name__ == '__main__':
-    #print(minX, maxX, minY, maxY)
-    #print(center, '\n', r)
     img_to_obj()
     cv2.imwrite("output.png", img2)
 

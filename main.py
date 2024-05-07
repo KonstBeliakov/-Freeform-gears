@@ -29,26 +29,21 @@ def draw(center_position, screen, pos, alpha, height, stretch=1.0, angles=None):
     :return: None
     """
     color = (0, 0, 0)
-    for i in range(len(pos) - 1):
-        pygame.draw.line(screen, color, [pos[i][0] + center_position[0], pos[i][1] + center_position[1]],
-                         [pos[i + 1][0] + center_position[0], pos[i + 1][1] + center_position[1]],
-                         settings.line_thickness)
-    pygame.draw.line(screen, color, [pos[-1][0] + center_position[0], pos[-1][1] + center_position[1]],
-                     [pos[0][0] + center_position[0], pos[0][1] + center_position[1]], settings.line_thickness)
+    points = [[p[0] + center_position[0], p[1] + center_position[1]] for p in pos]
+    pygame.draw.lines(screen, color, True, points, settings.line_thickness)
+
     dx = settings.r * alpha
 
+    points = []
+
     for i in range(len(height) - 1):
-        color = (0, 0, 0)
         if angles is None:
             a = i * (2 * pi / settings.n)
         else:
             a = angles[i]
-        pygame.draw.line(screen, color,
-                         [-dx * stretch + a * settings.r * stretch + center_position[0],
-                          height[i] + center_position[1]],
-                         [-dx * stretch + stretch * a * settings.r + 1 + center_position[0],
-                          height[i + 1] + center_position[1]],
-                         settings.line_thickness)
+        points.append([-dx * stretch + a * settings.r * stretch + center_position[0], height[i] + center_position[1]])
+
+    pygame.draw.lines(screen, color, False, points, settings.line_thickness)
 
 
 def run():
@@ -93,7 +88,7 @@ def run():
             angles = None
 
         draw([500, 100], screen, pos, alpha, height, 1.0, angles=angles)
-        draw([500, 500], screen, pos, alpha, height, 1.1, angles=angles)
+        draw([500, 500], screen, pos, alpha, height, 2, angles=angles)
 
         pygame.display.flip()
     pygame.quit()
