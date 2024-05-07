@@ -28,14 +28,17 @@ def draw(center_position, screen, pos, alpha, height, stretch=1.0, angles=None):
     :param stretch: surface tensile coefficient
     :return: None
     """
+    color = (0, 0, 0)
     for i in range(len(pos) - 1):
-        color = (0, 0, 0)  # (255 - i, i, 0)
         pygame.draw.line(screen, color, [pos[i][0] + center_position[0], pos[i][1] + center_position[1]],
-                         [pos[i + 1][0] + center_position[0], pos[i + 1][1] + center_position[1]], 1)
+                         [pos[i + 1][0] + center_position[0], pos[i + 1][1] + center_position[1]],
+                         settings.line_thickness)
+    pygame.draw.line(screen, color, [pos[-1][0] + center_position[0], pos[-1][1] + center_position[1]],
+                     [pos[0][0] + center_position[0], pos[0][1] + center_position[1]], settings.line_thickness)
     dx = settings.r * alpha
 
     for i in range(len(height) - 1):
-        color = (0, 0, 0)  # (0, i, 255)
+        color = (0, 0, 0)
         if angles is None:
             a = i * (2 * pi / settings.n)
         else:
@@ -45,7 +48,7 @@ def draw(center_position, screen, pos, alpha, height, stretch=1.0, angles=None):
                           height[i] + center_position[1]],
                          [-dx * stretch + stretch * a * settings.r + 1 + center_position[0],
                           height[i + 1] + center_position[1]],
-                         1)
+                         settings.line_thickness)
 
 
 def run():
@@ -101,15 +104,14 @@ def apply_settings():
         settings.r = int(entrys[0].get())
         settings.n = int(entrys[1].get())
         settings.speed = float(entrys[2].get())
-        settings.random_generated = False
-        settings.filename = entrys[6].get()
-        print(settings.filename)
-        if entrys[3].get() in ['True', 'y', 'Y', '1', 'yes', 'Yes', 'YES', 'true', 't']:
-            settings.random_generated = True
-        else:
-            image_read.img_to_obj()
+        settings.random_generated = entrys[3].get() in ['True', 'y', 'Y', '1', 'yes', 'Yes', 'YES', 'true', 't']
         settings.perlin_noise_params[0] = float(entrys[4].get())
         settings.perlin_noise_params[1] = float(entrys[5].get())
+        settings.filename = entrys[6].get()
+        settings.line_thickness = int(entrys[7].get())
+
+        if not settings.random_generated:
+            image_read.img_to_obj()
     except:
         error_text = tk.Label(root, text='Incorrect settings parametres', fg='#f00')
         error_text.grid(row=len(texts) + 1, column=0)
@@ -128,9 +130,11 @@ if __name__ == '__main__':
     root = tk.Tk()
     root.title("Settings")
 
-    texts = ['radius of random figure', 'number of point', 'speed', 'random generated figure (y/n)', 'k1 ("period")', 'k2 ("amplitude")', 'filename']
+    texts = ['radius of random figure', 'number of point', 'speed', 'random generated figure (y/n)', 'k1 ("period")',
+             'k2 ("amplitude")', 'filename', 'line thickness']
     entrys_values = [str(settings.r), str(settings.n), str(settings.speed), str(settings.random_generated),
-                     str(settings.perlin_noise_params[0]), str(settings.perlin_noise_params[1]), str(settings.filename)]
+                     str(settings.perlin_noise_params[0]), str(settings.perlin_noise_params[1]), str(settings.filename),
+                     str(settings.line_thickness)]
 
     labels = [tk.Label(root, text=text) for text in texts]
     entrys = [tk.Entry(root) for i in range(len(texts))]
