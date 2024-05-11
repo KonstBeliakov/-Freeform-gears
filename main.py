@@ -5,6 +5,7 @@ from time import perf_counter
 import image_read
 import settings
 import tkinter as tk
+from math import pi
 
 
 def position(h, alpha, angles=None):
@@ -31,8 +32,10 @@ def draw_shape(center_position, screen, pos):
                       settings.line_thickness)
 
 
-def draw_surface(center_position, screen, alpha, height, stretch=1.0, angles=None):
+def draw_surface(center_position, screen, alpha, height, stretch=1.0, angles=None, closed=True, surface_height=100):
     """
+    :param surface_height:
+    :param closed:
     :param angles: angles between vertical line and lines connecting center and the point on the surface of the figure
     :param height: distances from the center to the point on the surface of the figure
     :param center_position: position of center of rotating figure
@@ -51,11 +54,13 @@ def draw_surface(center_position, screen, alpha, height, stretch=1.0, angles=Non
         else:
             a = angles[i]
         points.append([-dx + a * settings.r * stretch + center_position[0], height[i] + center_position[1]])
+    if closed:
+        points.append([points[-1][0], center_position[1] + surface_height])
+        points.append([points[0][0], center_position[1] + surface_height])
+    pygame.draw.lines(screen, settings.shape_color, closed, points, settings.line_thickness)
 
-    pygame.draw.lines(screen, settings.shape_color, False, points, settings.line_thickness)
 
-
-def draw(center_position, screen, pos, alpha, height, stretch=1.0, angles=None):
+def draw(center_position, screen, pos, alpha, height, stretch=1.0, angles=None, closed=True, surface_height=100):
     """
     :param angles: angles between vertical line and lines connecting center and the point on the surface of the figure
     :param height: distances from the center to the point on the surface of the figure
@@ -67,7 +72,7 @@ def draw(center_position, screen, pos, alpha, height, stretch=1.0, angles=None):
     :return: None
     """
     draw_shape(center_position, screen, pos)
-    draw_surface(center_position, screen, alpha, height, stretch, angles)
+    draw_surface(center_position, screen, alpha, height, stretch, angles, closed, surface_height)
 
 
 def run():
@@ -110,10 +115,14 @@ def run():
         if random_generated:
             angles = None
 
-        draw_shape([900, 200], screen, pos1)
-        draw_surface([50, 100], screen, 0, height)
+        l = settings.r * settings.surface_stretching * pi * 2
 
-        draw([300, 550], screen, pos2, alpha, height, 1.0, angles=angles)
+        draw_surface([50, 100], screen, 0, height, stretch=settings.surface_stretching, angles=angles,
+                     closed=settings.closed_surface_contour, surface_height=settings.average_surface_height)
+        draw_shape([200 + l, 200], screen, pos1)
+
+        draw([300, 550], screen, pos2, alpha, height, stretch=settings.surface_stretching, angles=angles,
+             closed=settings.closed_surface_contour, surface_height=settings.average_surface_height)
 
         pygame.display.flip()
     pygame.quit()
@@ -129,6 +138,9 @@ def apply_settings():
         settings.perlin_noise_params[1] = float(entrys[5].get())
         settings.filename = entrys[6].get()
         settings.line_thickness = int(entrys[7].get())
+        settings.surface_stretching = float(entrys[8].get())
+        settings.closed_surface_contour = entrys[9].get() in ['True', 'y', 'Y', '1', 'yes', 'Yes', 'YES', 'true', 't']
+        settings.average_surface_height = int(entrys[10].get())
 
         if not settings.random_generated:
             image_read.img_to_obj()
@@ -151,10 +163,12 @@ if __name__ == '__main__':
     root.title("Settings")
 
     texts = ['radius of random figure', 'number of point', 'speed', 'random generated figure (y/n)', 'k1 ("period")',
-             'k2 ("amplitude")', 'filename', 'line thickness']
+             'k2 ("amplitude")', 'filename', 'line thickness', 'surface stretching', 'closed surface contour (y/n)',
+             'average surface height']
     entrys_values = [str(settings.r), str(settings.n), str(settings.speed), str(settings.random_generated),
                      str(settings.perlin_noise_params[0]), str(settings.perlin_noise_params[1]), str(settings.filename),
-                     str(settings.line_thickness)]
+                     str(settings.line_thickness), str(settings.surface_stretching),
+                     str(settings.closed_surface_contour), str(settings.average_surface_height)]
 
     labels = [tk.Label(root, text=text) for text in texts]
     entrys = [tk.Entry(root) for i in range(len(texts))]

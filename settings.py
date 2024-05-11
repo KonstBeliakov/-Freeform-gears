@@ -7,7 +7,12 @@ turning = False
 
 speed = .3
 
+surface_stretching = 1.0
+
 random_generated = True
+closed_surface_contour = True
+
+average_surface_height = 150
 
 perlin_noise_params = [.05, 100]
 
