@@ -15,13 +15,16 @@ def position(h, alpha, angles=None):
     return [[h[i] * sin(a + alpha), h[i] * cos(a + alpha)] for i, a in enumerate(angles)]
 
 
-def draw_shape(center_position, screen, pos):
+def draw_shape(center_position, screen, pos, draw_center=False):
     """
+    :param draw_center: parameter responsible for whether the center of the figure needs to be marked
     :param center_position: position of center of rotating figure
     :param screen: pygame screen
     :param pos: coordinates of points on the surface of a figure relative to its center
     :return: None
     """
+    if draw_center:
+        pygame.draw.circle(screen, settings.shape_color, center_position, 5, 1)
     pygame.draw.lines(screen, settings.shape_color, True,
                       [[p[0] + center_position[0], p[1] + center_position[1]] for p in pos],
                       settings.line_thickness)

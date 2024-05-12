@@ -11,6 +11,7 @@ surface_stretching = 1.0
 
 random_generated = True
 closed_surface_contour = True
+pair_of_gear = True
 
 average_surface_height = 150
 

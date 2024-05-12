@@ -37,7 +37,7 @@ def img_to_obj():
                 img2[i][j] = [255, 255, 255]
 
     center = [(minY + maxY) // 2, (minX + maxX) // 2]
-    settings.r = min((maxX - minX) // 2, (maxY - minY) // 2)
+    settings.r = min((maxX - minX), (maxY - minY)) // 2
 
     img2[center[0]][center[1]] = [255, 0, 0]
 
