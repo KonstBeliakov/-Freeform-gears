@@ -14,13 +14,14 @@ class SettingsWindow(tk.Tk):
 
         self.texts = ['radius of random figure', 'number of point', 'speed', 'random generated figure (y/n)',
                       'k1 ("period")', 'k2 ("amplitude")', 'filename', 'line thickness', 'surface stretching',
-                      'closed surface contour (y/n)', 'average surface height', 'generate a pair for a gear (y/n)']
+                      'closed surface contour (y/n)', 'average surface height', 'generate a pair for a gear (y/n)',
+                      'Save svg of the figure to:', 'Save svg of the surface to:']
 
         entrys_values = [str(settings.r), str(settings.n), str(settings.speed), str(settings.random_generated),
                          str(settings.perlin_noise_params[0]), str(settings.perlin_noise_params[1]),
                          str(settings.filename), str(settings.line_thickness), str(settings.surface_stretching),
                          str(settings.closed_surface_contour), str(settings.average_surface_height),
-                         str(settings.pair_of_gear)]
+                         str(settings.pair_of_gear), settings.figure_filename, settings.surface_filename]
 
         self.labels = [tk.Label(self, text=text) for text in self.texts]
         self.entrys = [tk.Entry(self) for i in range(len(self.texts))]
@@ -49,6 +50,9 @@ class SettingsWindow(tk.Tk):
             settings.average_surface_height = int(self.entrys[10].get())
 
             settings.pair_of_gear = self.entrys[11].get() in true_strings
+
+            settings.figure_filename = self.entrys[12].get()
+            settings.surface_filename = self.entrys[13].get()
 
             if not settings.random_generated:
                 image_read.img_to_obj()

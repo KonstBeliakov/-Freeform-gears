@@ -32,6 +32,16 @@ class MainWindow:
         self.t = perf_counter()
         self.t_speed = settings.speed
 
+        # saving svg files
+        if settings.figure_filename != settings.DONT_SAVE:
+            figure_coordinates = utils.position(self.height, 0, angles=self.angles)
+            utils.create_svg(figure_coordinates, settings.figure_filename)
+        if settings.surface_filename != settings.DONT_SAVE:
+            surface_coordinates = utils.surface_position([50, 100], 0, self.height, stretch=settings.surface_stretching,
+                                                         angles=self.angles, closed=settings.closed_surface_contour,
+                                                         surface_height=settings.average_surface_height)
+            utils.create_svg(surface_coordinates, settings.surface_filename)
+
     def update(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
