@@ -3,6 +3,7 @@ import tkinter as tk
 import image_read
 import settings
 from main_window import MainWindow
+from widgets import *
 
 
 class SettingsWindow(tk.Tk):
@@ -12,58 +13,61 @@ class SettingsWindow(tk.Tk):
 
         self.main_window = None
 
-        self.texts = ['radius of random figure', 'number of point', 'speed', 'random generated figure (y/n)',
-                      'k1 ("period")', 'k2 ("amplitude")', 'filename', 'line thickness', 'surface stretching',
-                      'closed surface contour (y/n)', 'average surface height', 'generate a pair for a gear (y/n)',
-                      'Save svg of the figure to:', 'Save svg of the surface to:']
+        self.widgets = [
+            TextEntry(self, 'Radius of random figure', str(settings.r)),
+            TextEntry(self, 'Number of points', str(settings.n)),
+            TextEntry(self, 'Speed', str(settings.speed)),
+            ChoiceYesNo(self, "Use random figure", settings.random_generated),
+            TextEntry(self, 'k1 ("period")', str(settings.perlin_noise_params[0])),
+            TextEntry(self, 'k2 ("amplitude")', str(settings.perlin_noise_params[1])),
+            TextEntry(self, 'Filename', str(settings.filename)),
+            TextEntry(self, 'Line thickness', str(settings.line_thickness)),
+            TextEntry(self, 'surface stretching', str(settings.surface_stretching)),
+            ChoiceYesNo(self, 'Closed surface contour', settings.closed_surface_contour),
+            TextEntry(self, 'Average surface height', str(settings.average_surface_height)),
+            ChoiceYesNo(self, 'Generate a pair for a gear', settings.pair_of_gear),
+            TextEntry(self, 'Figure filename (svg file)', str(settings.figure_filename)),
+            TextEntry(self, 'Surface filename (svg file)', str(settings.surface_filename)),
+        ]
 
-        entrys_values = [str(settings.r), str(settings.n), str(settings.speed), str(settings.random_generated),
-                         str(settings.perlin_noise_params[0]), str(settings.perlin_noise_params[1]),
-                         str(settings.filename), str(settings.line_thickness), str(settings.surface_stretching),
-                         str(settings.closed_surface_contour), str(settings.average_surface_height),
-                         str(settings.pair_of_gear), settings.figure_filename, settings.surface_filename]
-
-        self.labels = [tk.Label(self, text=text) for text in self.texts]
-        self.entrys = [tk.Entry(self) for i in range(len(self.texts))]
-
-        for i in range(len(self.texts)):
-            self.labels[i].grid(row=i, column=0)
-            self.entrys[i].insert(0, entrys_values[i])
-            self.entrys[i].grid(row=i, column=1)
-
-        button = tk.Button(self, text="Run", command=self.change_text)
-        button.grid(row=len(self.texts), column=0)
+        button = tk.Button(self, text="Run", command=self.on_run)
+        button.pack()
 
     def apply_settings(self):
         try:
-            settings.r = int(self.entrys[0].get())
-            settings.n = int(self.entrys[1].get())
-            settings.speed = float(self.entrys[2].get())
-            true_strings = ['True', 'y', 'Y', '1', 'yes', 'Yes', 'YES', 'true', 't']
-            settings.random_generated = self.entrys[3].get() in true_strings
-            settings.perlin_noise_params[0] = float(self.entrys[4].get())
-            settings.perlin_noise_params[1] = float(self.entrys[5].get())
-            settings.filename = self.entrys[6].get()
-            settings.line_thickness = int(self.entrys[7].get())
-            settings.surface_stretching = float(self.entrys[8].get())
-            settings.closed_surface_contour = self.entrys[9].get() in true_strings
-            settings.average_surface_height = int(self.entrys[10].get())
+            settings.r = int(self.widgets[0].get())
+            settings.n = int(self.widgets[1].get())
+            settings.speed = float(self.widgets[2].get())
+            settings.random_generated = self.widgets[3].get()
 
-            settings.pair_of_gear = self.entrys[11].get() in true_strings
+            # k1, k2
+            settings.perlin_noise_params[0] = float(self.widgets[4].get())
+            settings.perlin_noise_params[1] = float(self.widgets[5].get())
 
-            settings.figure_filename = self.entrys[12].get()
-            settings.surface_filename = self.entrys[13].get()
+            settings.filename = self.widgets[6].get()
+            settings.line_thickness = int(self.widgets[7].get())
+
+            settings.surface_stretching = float(self.widgets[8].get())
+
+            settings.closed_surface_contour = self.widgets[9].get()
+            settings.average_surface_height = int(self.widgets[10].get())
+            settings.pair_of_gear = self.widgets[11].get()
+
+            # figure_filename, surface_filename
+            settings.figure_filename = self.widgets[12].get()
+            settings.surface_filename = self.widgets[13].get()
 
             if not settings.random_generated:
                 image_read.img_to_obj()
-        except:
-            error_text = tk.Label(self, text='Incorrect settings parameters', fg='#f00')
-            error_text.grid(row=len(self.texts) + 1, column=0)
+
+        except Exception as exc:
+            error_label = tk.Label(self, text=f"Incorrect settings parameters: {exc}", fg="#f00")
+            error_label.pack()
             return False
         else:
             return True
 
-    def change_text(self):
+    def on_run(self):
         if self.apply_settings():
             self.destroy()
             self.main_window = MainWindow()
